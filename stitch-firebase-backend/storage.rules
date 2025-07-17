@@ -1,0 +1,10 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Audio files are write-only for authenticated users
+    match /audio/{allPaths=**} {
+      allow read: if false;
+      allow write: if request.auth != null && request.resource.size < 5 * 1024 * 1024; // 5MB limit
+    }
+  }
+}

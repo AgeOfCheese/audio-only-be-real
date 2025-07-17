@@ -1,0 +1,26 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Daily prompts are readable by all authenticated users
+    match /daily_prompts/{promptId} {
+      allow read: if request.auth != null;
+      allow write: if false; // Only cloud functions can write
+    }
+    
+    // Audio responses are write-only for users, read-only for cloud functions
+    match /audio_responses/{responseId} {
+      allow read: if false; // Only cloud functions can read
+      allow write: if false; // Only cloud functions can write
+    }
+    
+    // Moderation queue is admin-only
+    match /moderation_queue/{docId} {
+      allow read, write: if false; // Only cloud functions
+    }
+    
+    // Escalated responses are admin-only
+    match /escalated_responses/{docId} {
+      allow read, write: if false; // Only cloud functions
+    }
+  }
+}
